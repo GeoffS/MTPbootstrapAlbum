@@ -1,2 +1,3 @@
 test album/*.jpg
 test album/album.html
+*.pyc
