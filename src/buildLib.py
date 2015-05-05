@@ -77,17 +77,20 @@ def findElemWithId(parentElem, tag, id):
             return candidateElem
     return None
 
-def findSidebar(parentElem):
+def findDiv(parentElem, idStr):
     for elem in list(parentElem):
         if elem.tag == 'div':
             idAttrib = elem.get('id')
             if idAttrib != None:
-                if idAttrib == 'sidebarLinks':
+                if idAttrib == idStr:
                     return elem
-        candidateElem = findSidebar(elem)
+        candidateElem = findDiv(elem, idStr)
         if candidateElem != None:
             return candidateElem
     return None
+
+def findSidebar(parentElem):
+    return findDiv(parentElem, 'sidebarLinks')
 
 def addLinkTextTo(elem, linkText):
     if linkText[0] == '&':
