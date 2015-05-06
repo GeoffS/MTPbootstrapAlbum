@@ -25,3 +25,11 @@ div.gridFooter {
     margin: 0px auto 0px auto;
     text-align:center;
 }
+/* COLLECTION HEADER */
+h1.albumName {
+    font-family: helvetica,arial,tahoma,verdana,sans-serif;
+    font-size: 24px;
+    color: #F0F0F0;
+    margin:0;
+    font-weight: bold;
+}

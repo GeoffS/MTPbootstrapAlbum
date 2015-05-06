@@ -27,7 +27,7 @@ if __name__ == '__main__':
     
     autoClean = True
     pageTemplateFile = "albumTemplate.html"
-    supportFiles = ["mtp.css", "134GridGrBlu.png"]
+    supportFiles = ["mtp.css", "134GridGrBlu.png", "MTP_Banner_2014_360x40.png"]
     imageBkgSize = 134 # pixels
     
     if not srcDir.endswith(os.sep):
