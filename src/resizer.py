@@ -20,10 +20,13 @@ def resizer(f, srcDir, dstDir, size=120):
     vsize = int((float(img.size[0]) * float(wpercent)))
     hsize = int((float(img.size[1]) * float(wpercent)))
     img = img.resize((vsize, hsize), Image.ANTIALIAS).filter(ImageFilter.SHARPEN)
-    tnName = dstDir+"t_"+f
+    baseName = "t_"+f
+    tnName = dstDir+baseName
     img.save(tnName)
     
     tnDesc = imgDescr()
+    tnDesc.baseName = baseName
+    tnDesc.srcBaseName = f
     tnDesc.srcName = srcName
     tnDesc.name = tnName
     tnDesc.width = vsize

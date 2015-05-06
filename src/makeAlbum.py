@@ -101,9 +101,9 @@ if __name__ == '__main__':
         aElem = div2.find('a')
         imgElem = aElem.find('img')
         
-        aElem.set('href', tn.srcName)
+        aElem.set('href', tn.srcBaseName)
         
-        imgElem.set('src', tn.name)
+        imgElem.set('src', tn.baseName)
         width = str(tn.width)
         height = str(tn.height)
         marginTop  = str((imageBkgSize-tn.height)/2)
