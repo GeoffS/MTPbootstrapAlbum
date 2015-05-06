@@ -27,6 +27,8 @@ if __name__ == '__main__':
     
     autoClean = True
     pageTemplateFile = "albumTemplate.html"
+    supportFiles = ["mtp.css", "134GridGrBlu.png"]
+    imageBkgSize = 134 # pixels
     
     if not srcDir.endswith(os.sep):
         srcDir = srcDir+os.sep
@@ -59,6 +61,10 @@ if __name__ == '__main__':
     print dstDir+" cleand."
     if not os.path.exists(dstDir):
         os.makedirs(dstDir)
+        
+    print "Copying support files..."
+    for f in supportFiles:
+        shutil.copyfile(f, dstDir+f)
     
     print "Creating thumbnails..."
     tnDescrs = []
@@ -98,7 +104,14 @@ if __name__ == '__main__':
         aElem.set('href', tn.srcName)
         
         imgElem.set('src', tn.name)
-        imgElem.set('style', 'width:'+str(tn.width)+'px;height:'+str(tn.height)+'px;')
+        width = str(tn.width)
+        height = str(tn.height)
+        marginTop  = str((imageBkgSize-tn.height)/2)
+        marginLeft = str((imageBkgSize-tn.width)/2)
+#         imgElem.set('style', 'width:'+width+'px;height:'+height+'px;margin-top:'+marginTop+'px;margin-left:'+marginLeft+'px;')
+        imgElem.set('style', 'margin-top:'+marginTop+'px;margin-left:'+marginLeft+'px;')
+        imgElem.set('width',  width)
+        imgElem.set('height', height)
         
         photoRow.insert(0, divElem)
         
