@@ -25,6 +25,8 @@ if __name__ == '__main__':
     srcDir = sys.argv[1]
     dstDir = sys.argv[2]
     
+    albumTitle = "MTP bootstrap Album blokart photos test"
+    
     autoClean = True
     pageTemplateFile = "albumTemplate.html"
     supportFiles = ["mtp.css", "134GridGrBlu.png", "MTP_Banner_2014_360x40.png"]
@@ -80,8 +82,16 @@ if __name__ == '__main__':
     print pageTemplateFile+' => '+destFile
 
     templateTree, templateRoot = bl.loadXmlFileWithIncludes(pageTemplateFile)
+    
     genElem = bl.findElemWith(templateRoot, "meta", "name", "generator")
     genElem.set("content", scriptVersion+" - "+str(datetime.now()))
+    
+    headerTitleElem = templateRoot.find("head").find("title")
+    headerTitleElem.text = albumTitle
+     
+    titleElem = bl.findElemWithId(templateRoot, "h1", "albumName")
+    titleElem.text = albumTitle
+    
     photoRow = bl.findDiv(templateRoot, "photoRow")
     
     print "Adding padding lines: ",
