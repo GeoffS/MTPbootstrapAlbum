@@ -7,10 +7,16 @@ import sys
 import os
 from xml.etree.ElementTree import ElementTree
 import xml.etree.ElementTree as ET
+import shutil
 from resizer import resizer
 import buildLib as bl
+from datetime import datetime
 
-#import buildLib
+scriptVersion = "MTPbootstrapAlbum 1.0"
+
+class struct:
+    pass
+    
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
@@ -19,6 +25,9 @@ if __name__ == '__main__':
     srcDir = sys.argv[1]
     dstDir = sys.argv[2]
     
+    autoClean = True
+    pageTemplateFile = "albumTemplate.html"
+    
     if not srcDir.endswith(os.sep):
         srcDir = srcDir+os.sep
     if not dstDir.endswith(os.sep):
@@ -26,29 +35,47 @@ if __name__ == '__main__':
     
     print "Create album in '"+dstDir+"' from images in '"+srcDir+"'"
     
-    pageTemplateFile = "albumTemplate.html"
+    rmTreeOK = struct()
+    rmTreeOK.b = False
+    def handleErr(func, path, exc_info):
+        print "handleErr:", func, path, exc_info
+        rmTreeOK.b = (func == os.rmdir)
+        print "rmTreeOK=", rmTreeOK.b
     
+    if os.path.exists(dstDir):
+        if autoClean:
+            print "Auto-cleaning "+dstDir
+            shutil.rmtree(dstDir, onerror=handleErr)
+            if not rmTreeOK.b:
+                exit()
+        else:
+            print "The destination directiory, "+dstDir+", already exists."
+            resp = raw_input("Enter 'Y' to delete it, any other key to exit.")
+            if resp == 'y' or resp == 'Y':
+                shutil.rmtree(dstDir, onerror=handleErr)
+            elif not rmTreeOK.b:
+                print "Command aborted, no changes made."
+                exit()
+    print dstDir+" cleand."
+    if not os.path.exists(dstDir):
+        os.makedirs(dstDir)
+    
+    print "Creating thumbnails..."
     tnDescrs = []
     for f in os.listdir(srcDir):
         if f.endswith(".jpg"):
             print "Processing: "+f
             tn = resizer(f, srcDir, dstDir)
             tnDescrs.append(tn)
-            
+            shutil.copyfile(srcDir+f, dstDir+f)
 
     destFile = dstDir+'album.html' 
     print "\n---------------"
     print pageTemplateFile+' => '+destFile
-    
-    try:
-        os.remove(destFile)
-    except WindowsError as (errno, strerror):
-        #print "WindowsError({0}): {1}".format(errno, strerror)
-        #print "Note: No "+destFile+" to remove."
-        pass
-    
 
     templateTree, templateRoot = bl.loadXmlFileWithIncludes(pageTemplateFile)
+    genElem = bl.findElemWith(templateRoot, "meta", "name", "generator")
+    genElem.set("content", scriptVersion+" - "+str(datetime.now()))
     photoRow = bl.findDiv(templateRoot, "photoRow")
     
     print "Adding padding lines: ",

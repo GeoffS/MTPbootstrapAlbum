@@ -77,6 +77,18 @@ def findElemWithId(parentElem, tag, id):
             return candidateElem
     return None
 
+def findElemWith(parentElem, tag, attrib, value):
+    for elem in list(parentElem):
+        if elem.tag == tag:
+            idAttrib = elem.get(attrib)
+            if idAttrib != None:
+                if idAttrib == value:
+                    return elem
+        candidateElem = findElemWith(elem, tag, attrib, value)
+        if candidateElem != None:
+            return candidateElem
+    return None
+
 def findDiv(parentElem, idStr):
     for elem in list(parentElem):
         if elem.tag == 'div':
@@ -262,3 +274,11 @@ def photoNav(srcRoot):
         navLine.set('style', 'margin-left:'+str((photoNavDivWidth-lineWidth)/2)+'px; margin-right:auto;')
     
     return srcRoot.getchildren()
+
+def deleteFile(f):
+    try:
+        os.remove(f)
+    except WindowsError as (errno, strerror):
+        #print "WindowsError({0}): {1}".format(errno, strerror)
+        #print "Note: No "+destFile+" to remove."
+        pass
