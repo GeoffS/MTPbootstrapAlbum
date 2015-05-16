@@ -1,3 +1,6 @@
+div {
+    display:block;
+}
 div.gridElem {
     float:left;
     width:134px;
@@ -5,11 +8,8 @@ div.gridElem {
     background-image:url('134GridGrBlu.png');
     background-size:134px 134px;
     background-repeat:no-repeat;
-}
-img.indexGrid {
-    border-style:solid;
-    border-width:1px;
-    border-color:#c0c0c0;
+    display:inline-block;
+    margin:2px;
 }
 img.indexGrid:hover {
     border-color:#ffffff;
@@ -22,10 +22,10 @@ div.detailFooter {
 }
 div.gridFooter {
     font-size: 10px;
-    margin: 0px auto 0px auto;
+    margin: 3px auto 0px auto;
     text-align:center;
+    clear:both;
 }
-/* COLLECTION HEADER */
 h1.albumName {
     font-family: helvetica,arial,tahoma,verdana,sans-serif;
     font-size: 24px;

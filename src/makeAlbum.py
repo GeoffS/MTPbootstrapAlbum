@@ -106,12 +106,12 @@ if __name__ == '__main__':
     
     photoRow = bl.findDiv(templateRoot, "photoRow")
     
-    print "Adding padding lines: ",
-    for i in range(6-(len(tnDescrs) % 6)):
-        divTree, divElem = bl.loadXmlStringWithIncludes(r'<div class="col-xs-6 col-sm-3 col-md-2"> </div>')
-        photoRow.insert(0, divElem)
-        print str(i),
-    print
+#     print "Adding padding lines: ",
+#     for i in range(6-(len(tnDescrs) % 6)):
+#         divTree, divElem = bl.loadXmlStringWithIncludes(r'<div class="col-xs-6 col-sm-3 col-md-2"> </div>')
+#         photoRow.insert(0, divElem)
+#         print str(i),
+#     print
     
     for tn in tnDescrs:
         print "Adding "+tn.srcName+" to thumbnail section."
@@ -119,8 +119,7 @@ if __name__ == '__main__':
         linkTemplateRoot = linkTemplateTree.parse('thumbnail_template.f', parser = bl.CommentedTreeBuilder())
         divElem = linkTemplateRoot.find('div')
         
-        div2 = divElem.find('div')
-        aElem = div2.find('a')
+        aElem = divElem.find('a')
         imgElem = aElem.find('img')
         
         aElem.set('href', tn.srcBaseName)
