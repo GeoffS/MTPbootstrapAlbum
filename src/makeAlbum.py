@@ -16,6 +16,18 @@ scriptVersion = "MTPbootstrapAlbum 1.0"
 
 class struct:
     pass
+
+
+def readTitle(srcDir):
+    titleFilename = srcDir+"title.txt"
+    if os.path.exists(titleFilename):
+        print "Reading title file: "+titleFilename
+        titleFile = open(titleFilename, 'r')
+        titleStr = titleFile.readline()
+        titleFile.close()
+    else:
+        titleStr = " "
+    return titleStr
     
 
 if __name__ == '__main__':
@@ -24,9 +36,7 @@ if __name__ == '__main__':
         exit()
     srcDir = sys.argv[1]
     dstDir = sys.argv[2]
-    
-    albumTitle = "MTP bootstrap Album blokart photos test"
-    
+
     autoClean = True
     pageTemplateFile = "albumTemplate.html"
     supportFiles = ["mtp.css", "134GridGrBlu.png", "MTP_Banner_2014_360x40.png"]
@@ -38,6 +48,8 @@ if __name__ == '__main__':
         dstDir = dstDir+os.sep
     
     print "Create album in '"+dstDir+"' from images in '"+srcDir+"'"
+    
+    albumTitle = readTitle(srcDir)
     
     rmTreeOK = struct()
     rmTreeOK.b = False
