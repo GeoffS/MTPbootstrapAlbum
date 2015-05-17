@@ -28,29 +28,8 @@ def readTitle(srcDir):
     else:
         titleStr = " "
     return titleStr
-    
 
-if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print "Uasge: srcDir destDir"
-        exit()
-    srcDir = sys.argv[1]
-    dstDir = sys.argv[2]
-
-    autoClean = True
-    pageTemplateFile = "albumTemplate.html"
-    supportFiles = ["mtp.css", "134GridGrBlu.png", "MTP_Banner_2014_360x40.png"]
-    imageBkgSize = 134 # pixels
-    
-    if not srcDir.endswith(os.sep):
-        srcDir = srcDir+os.sep
-    if not dstDir.endswith(os.sep):
-        dstDir = dstDir+os.sep
-    
-    print "Create album in '"+dstDir+"' from images in '"+srcDir+"'"
-    
-    albumTitle = readTitle(srcDir)
-    
+def createEmptyAlbumDirectory(albumDir, autoClean=True):
     rmTreeOK = struct()
     rmTreeOK.b = False
     def handleErr(func, path, exc_info):
@@ -58,42 +37,49 @@ if __name__ == '__main__':
         rmTreeOK.b = (func == os.rmdir)
         print "rmTreeOK=", rmTreeOK.b
     
-    if os.path.exists(dstDir):
+    if os.path.exists(albumDir):
         if autoClean:
-            print "Auto-cleaning "+dstDir
-            shutil.rmtree(dstDir, onerror=handleErr)
-            if not rmTreeOK.b:
-                exit()
+            print "Auto-cleaning "+albumDir
+            shutil.rmtree(albumDir, onerror=handleErr)
+            if not rmTreeOK.b: return True
         else:
-            print "The destination directiory, "+dstDir+", already exists."
+            print "The destination directiory, "+albumDir+", already exists."
             resp = raw_input("Enter 'Y' to delete it, any other key to exit.")
-            if resp == 'y' or resp == 'Y':
-                shutil.rmtree(dstDir, onerror=handleErr)
-            elif not rmTreeOK.b:
+            if resp == 'Y':
+                shutil.rmtree(albumDir, onerror=handleErr)
+                if not rmTreeOK.b: return True
+            else:
                 print "Command aborted, no changes made."
-                exit()
-    print dstDir+" cleand."
-    if not os.path.exists(dstDir):
-        os.makedirs(dstDir)
-        
-    print "Copying support files..."
-    for f in supportFiles:
-        shutil.copyfile(f, dstDir+f)
-    
-    print "Creating thumbnails..."
-    tnDescrs = []
-    for f in os.listdir(srcDir):
-        if f.endswith(".jpg"):
-            print "Processing: "+f
-            tn = resizer(f, srcDir, dstDir)
-            tnDescrs.append(tn)
-            shutil.copyfile(srcDir+f, dstDir+f)
+                return True
+    print albumDir+" cleand."
+    if not os.path.exists(albumDir):
+        os.makedirs(albumDir)
+    return False
 
-    destFile = dstDir+'album.html' 
+
+def createViewerFile(viewerTemplateFile, tnDescrs, dstDir):
+    destFile = dstDir+'viewer.html' 
     print "\n---------------"
-    print pageTemplateFile+' => '+destFile
+    print albumTemplateFile+' => '+destFile
+    templateTree, templateRoot = bl.loadXmlFileWithIncludes(albumTemplateFile)
+    
+    genElem = bl.findElemWith(templateRoot, "meta", "name", "generator")
+    genElem.set("content", scriptVersion+" - "+str(datetime.now()))
+    
+    # TBD do something...
+    
+    print "Writing "+destFile
+    dest = open(destFile, 'w')
+    dest.write(r'<!DOCTYPE html>')
+    templateTree.write(dest)
+    dest.close()
 
-    templateTree, templateRoot = bl.loadXmlFileWithIncludes(pageTemplateFile)
+
+def createAlbumFile(albumTemplateFile, tnDescrs, dstDir):
+    destFile = dstDir+'index.html' 
+    print "\n---------------"
+    print albumTemplateFile+' => '+destFile
+    templateTree, templateRoot = bl.loadXmlFileWithIncludes(albumTemplateFile)
     
     genElem = bl.findElemWith(templateRoot, "meta", "name", "generator")
     genElem.set("content", scriptVersion+" - "+str(datetime.now()))
@@ -105,13 +91,6 @@ if __name__ == '__main__':
     titleElem.text = albumTitle
     
     photoRow = bl.findDiv(templateRoot, "photoRow")
-    
-#     print "Adding padding lines: ",
-#     for i in range(6-(len(tnDescrs) % 6)):
-#         divTree, divElem = bl.loadXmlStringWithIncludes(r'<div class="col-xs-6 col-sm-3 col-md-2"> </div>')
-#         photoRow.insert(0, divElem)
-#         print str(i),
-#     print
     
     for tn in tnDescrs:
         print "Adding "+tn.srcName+" to thumbnail section."
@@ -141,5 +120,56 @@ if __name__ == '__main__':
     dest.write(r'<!DOCTYPE html>')
     templateTree.write(dest)
     dest.close()
+
+
+def createThumbnails(srcDir, dstDir):
+    print "Creating thumbnails..."
+    tnDescrs = []
+    for f in os.listdir(srcDir):
+        if f.endswith(".jpg"):
+            print "Processing: "+f
+            tn = resizer(f, srcDir, dstDir)
+            tnDescrs.append(tn)
+            shutil.copyfile(srcDir+f, dstDir+f)
+    return tnDescrs
+
+
+def copyFiles(supportFiles, dstDir):
+    print "Copying support files..."
+    for f in supportFiles:
+        shutil.copyfile(f, dstDir+f)
+    
+    
+def addSepIfNecess(f):
+    if not f.endswith(os.sep): return f+os.sep
+    else:                      return f
+    
+
+if __name__ == '__main__':
+    if len(sys.argv) < 3:
+        print "Uasge: srcDir destDir"
+        exit()
+        
+    srcDir = addSepIfNecess(sys.argv[1])
+    dstDir = addSepIfNecess(sys.argv[2])
+
+    albumTemplateFile = "albumTemplate.html"
+    viewerTemplateFile = 'viewerTemplate.html'
+    supportFiles = ["mtp.css", "134GridGrBlu.png", "MTP_Banner_2014_360x40.png"]
+    imageBkgSize = 134 # pixels
+    
+    print "Create album in '"+dstDir+"' from images in '"+srcDir+"'"
+    
+    albumTitle = readTitle(srcDir)
+    
+    if(createEmptyAlbumDirectory(dstDir)): exit()
+        
+    copyFiles(supportFiles, dstDir)
+    
+    tnDescrs = createThumbnails(srcDir, dstDir)
+
+    createAlbumFile(albumTemplateFile, tnDescrs, dstDir)
+    
+    createViewerFile(viewerTemplateFile, tnDescrs, dstDir)
     
     print "Done!"
