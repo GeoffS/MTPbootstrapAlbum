@@ -155,6 +155,21 @@ function init() {
     var href = window.location.href;
     parent = href.substring(0, href.lastIndexOf('/')+1)
     console.log('Parent URL: '+parent);
+    var qs = location.search;
+    console.log('Query String:'+qs);
+    if(qs != null && qs != '' && qs[0] =='?') {
+        var imgName = qs.substring(1, 500);
+        console.log('imgName='+imgName);
+        for (var i = 0; i < images.length; i++) {
+            if(imgName == images[i]){
+                imageIndex = i-1;
+                break;
+            }
+        }
+    } else {
+        console.log('No image in URL...');
+        imageIndex = -1;
+    }
     nextImage();
     bodyElem.onresize = resize;
 }
