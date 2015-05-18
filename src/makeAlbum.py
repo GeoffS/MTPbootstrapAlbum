@@ -98,7 +98,7 @@ def createAlbumFile(albumTemplateFile, tnDescrs, dstDir):
     
     photoRow = bl.findDiv(templateRoot, "photoRow")
     
-    for tn in tnDescrs:
+    for tn in reversed(tnDescrs):
         print "Adding "+tn.srcName+" to thumbnail section."
         linkTemplateTree = ElementTree()
         linkTemplateRoot = linkTemplateTree.parse('thumbnail_template.f', parser = bl.CommentedTreeBuilder())
