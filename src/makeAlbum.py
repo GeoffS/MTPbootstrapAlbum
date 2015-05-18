@@ -60,13 +60,19 @@ def createEmptyAlbumDirectory(albumDir, autoClean=True):
 def createViewerFile(viewerTemplateFile, tnDescrs, dstDir):
     destFile = dstDir+'viewer.html' 
     print "\n---------------"
-    print albumTemplateFile+' => '+destFile
-    templateTree, templateRoot = bl.loadXmlFileWithIncludes(albumTemplateFile)
+    print viewerTemplateFile+' => '+destFile
+    templateTree, templateRoot = bl.loadXmlFileWithIncludes(viewerTemplateFile)
     
     genElem = bl.findElemWith(templateRoot, "meta", "name", "generator")
     genElem.set("content", scriptVersion+" - "+str(datetime.now()))
     
-    # TBD do something...
+    imageList = 'var images = ['
+    for tn in tnDescrs:
+        imageList += "'"+tn.srcBaseName+"',"
+    imageList = imageList[:-1]+"]"
+    
+    hsElem = bl.findElemWithId(templateRoot, "script", "headScript")
+    hsElem.text = imageList
     
     print "Writing "+destFile
     dest = open(destFile, 'w')
@@ -101,7 +107,7 @@ def createAlbumFile(albumTemplateFile, tnDescrs, dstDir):
         aElem = divElem.find('a')
         imgElem = aElem.find('img')
         
-        aElem.set('href', tn.srcBaseName)
+        aElem.set('href', 'viewer.html?'+tn.srcBaseName)
         
         imgElem.set('src', tn.baseName)
         width = str(tn.width)
@@ -155,7 +161,7 @@ if __name__ == '__main__':
 
     albumTemplateFile = "albumTemplate.html"
     viewerTemplateFile = 'viewerTemplate.html'
-    supportFiles = ["mtp.css", "134GridGrBlu.png", "MTP_Banner_2014_360x40.png"]
+    supportFiles = ["mtp.css", "134GridGrBlu.png", "MTP_Banner_2014_360x40.png", "screenfull.min.js", "spin.min.js", "hammer.min.js", "MTPviewer.js"]
     imageBkgSize = 134 # pixels
     
     print "Create album in '"+dstDir+"' from images in '"+srcDir+"'"

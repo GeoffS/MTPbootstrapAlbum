@@ -152,7 +152,8 @@ function checkComplete() {
 function init() {
     console.log('init()');
     footer.innerHTML = 'init()';
-    parent = window.location.href.substring(0,window.location.href.length-15);
+    var href = window.location.href;
+    parent = href.substring(0, href.lastIndexOf('/')+1)
     console.log('Parent URL: '+parent);
     nextImage();
     bodyElem.onresize = resize;
