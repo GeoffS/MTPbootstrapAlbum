@@ -112,6 +112,7 @@ function updateImage() {
     oldImage = document.getElementById('image');
     newImage = document.createElement("img");
     newImage.src=images[imageIndex];
+    history.pushState('', '', parent+'viewer.html?'+images[imageIndex]);
     checkComplete(); 
 }
 function nextImageStep2() {
