@@ -42,12 +42,14 @@ def createEmptyAlbumDirectory(albumDir, autoClean=True):
     if os.path.exists(albumDir):
         if autoClean:
             print "Auto-cleaning "+albumDir
+            rmTreeOK.b = False
             shutil.rmtree(albumDir, onerror=handleErr)
             if not rmTreeOK.b: return True
         else:
             print "The destination directiory, "+albumDir+", already exists."
             resp = raw_input("Enter 'Y' to delete it, any other key to exit.")
             if resp == 'Y':
+                rmTreeOK.b = False
                 shutil.rmtree(albumDir, onerror=handleErr)
                 if not rmTreeOK.b: return True
             else:
@@ -85,7 +87,7 @@ def createViewerFile(viewerTemplateFile, tnDescrs, shortAlbumTitle, dstDir):
     dest.close()
 
 
-def createAlbumFile(albumTemplateFile, tnDescrs, dstDir):
+def createAlbumFile(albumTemplateFile, thumbnailTemplateFile, tnDescrs, dstDir):
     destFile = dstDir+'index.html' 
     print "\n---------------"
     print albumTemplateFile+' => '+destFile
@@ -105,7 +107,7 @@ def createAlbumFile(albumTemplateFile, tnDescrs, dstDir):
     for tn in reversed(tnDescrs):
         print "Adding "+tn.srcName+" to thumbnail section."
         linkTemplateTree = ElementTree()
-        linkTemplateRoot = linkTemplateTree.parse('thumbnail_template.f', parser = bl.CommentedTreeBuilder())
+        linkTemplateRoot = linkTemplateTree.parse(thumbnailTemplateFile, parser = bl.CommentedTreeBuilder())
         divElem = linkTemplateRoot.find('div')
         
         aElem = divElem.find('a')
@@ -144,10 +146,10 @@ def createThumbnails(srcDir, dstDir):
     return tnDescrs
 
 
-def copyFiles(supportFiles, dstDir):
+def copyFiles(resDir, supportFiles, dstDir):
     print "Copying support files..."
     for f in supportFiles:
-        shutil.copyfile(f, dstDir+f)
+        shutil.copyfile(resDir+f, dstDir+f)
     
     
 def addSepIfNecess(f):
@@ -156,15 +158,18 @@ def addSepIfNecess(f):
     
 
 if __name__ == '__main__':
+    print sys.argv[0]
     if len(sys.argv) < 3:
         print "Uasge: srcDir destDir"
         exit()
-        
+    
+    resDir = addSepIfNecess(os.path.dirname(sys.argv[0]))
     srcDir = addSepIfNecess(sys.argv[1])
     dstDir = addSepIfNecess(sys.argv[2])
 
-    albumTemplateFile = "albumTemplate.html"
-    viewerTemplateFile = 'viewerTemplate.html'
+    albumTemplateFile = resDir+"albumTemplate.html"
+    thumbnailTemplateFile = resDir+'thumbnail_template.f'
+    viewerTemplateFile = resDir+'viewerTemplate.html'
     supportFiles = ["mtp.css", "134GridGrBlu.png", "MTP_Banner_2014_360x40.png", "screenfull.min.js", "spin.min.js", "hammer.min.js", "MTPviewer.js"]
     imageBkgSize = 134 # pixels
     
@@ -174,11 +179,11 @@ if __name__ == '__main__':
     
     if(createEmptyAlbumDirectory(dstDir)): exit()
         
-    copyFiles(supportFiles, dstDir)
+    copyFiles(resDir, supportFiles, dstDir)
     
     tnDescrs = createThumbnails(srcDir, dstDir)
 
-    createAlbumFile(albumTemplateFile, tnDescrs, dstDir)
+    createAlbumFile(albumTemplateFile, thumbnailTemplateFile, tnDescrs, dstDir)
     
     createViewerFile(viewerTemplateFile, tnDescrs, shortAlbumTitle, dstDir)
     
