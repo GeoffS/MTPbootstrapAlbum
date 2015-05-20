@@ -27,6 +27,8 @@ var oldImage;
 var newImage;
 var spinner;
 var parent;
+var checkCounter;
+var checkWait;
 
 var hammertime = new Hammer(bodyElem);
 hammertime.get('swipe').set({ direction: Hammer.DIRECTION_ALL });
@@ -130,6 +132,8 @@ function replaceImgElem(doPush) {
     	history.pushState(imageIndex, imageName, '?'+imageName);
     }
     document.title = shortAlbumTitle+"-"+imageName;
+    checkCounter = 0;
+    checkWait = 50;
     checkComplete(); 
 }
 function nextImageStep2() {
@@ -144,8 +148,6 @@ function nextImageStep2() {
     resize(newImage);
     updating = false;
 }
-var checkCounter = 0;
-var checkWait = 50;
 function checkComplete() {
     if(newImage.complete || checkCounter > 10) {
     //if(checkCounter > 3) { // for spinner testing
