@@ -24,10 +24,12 @@ def readTitle(srcDir):
         print "Reading title file: "+titleFilename
         titleFile = open(titleFilename, 'r')
         titleStr = titleFile.readline()
+        shortTitleStr = titleFile.readline()
         titleFile.close()
     else:
         titleStr = " "
-    return titleStr
+        shortTitleStr = " "
+    return titleStr, shortTitleStr
 
 def createEmptyAlbumDirectory(albumDir, autoClean=True):
     rmTreeOK = struct()
@@ -57,7 +59,7 @@ def createEmptyAlbumDirectory(albumDir, autoClean=True):
     return False
 
 
-def createViewerFile(viewerTemplateFile, tnDescrs, dstDir):
+def createViewerFile(viewerTemplateFile, tnDescrs, shortAlbumTitle, dstDir):
     destFile = dstDir+'viewer.html' 
     print "\n---------------"
     print viewerTemplateFile+' => '+destFile
@@ -66,13 +68,15 @@ def createViewerFile(viewerTemplateFile, tnDescrs, dstDir):
     genElem = bl.findElemWith(templateRoot, "meta", "name", "generator")
     genElem.set("content", scriptVersion+" - "+str(datetime.now()))
     
+    shortTitleVar = 'var shortAlbumTitle="'+shortAlbumTitle+'";';
+    
     imageList = 'var images = ['
     for tn in tnDescrs:
         imageList += "'"+tn.srcBaseName+"',"
     imageList = imageList[:-1]+"]"
     
     hsElem = bl.findElemWithId(templateRoot, "script", "headScript")
-    hsElem.text = imageList
+    hsElem.text = shortTitleVar + imageList
     
     print "Writing "+destFile
     dest = open(destFile, 'w')
@@ -166,7 +170,7 @@ if __name__ == '__main__':
     
     print "Create album in '"+dstDir+"' from images in '"+srcDir+"'"
     
-    albumTitle = readTitle(srcDir)
+    albumTitle, shortAlbumTitle = readTitle(srcDir)
     
     if(createEmptyAlbumDirectory(dstDir)): exit()
         
@@ -176,6 +180,6 @@ if __name__ == '__main__':
 
     createAlbumFile(albumTemplateFile, tnDescrs, dstDir)
     
-    createViewerFile(viewerTemplateFile, tnDescrs, dstDir)
+    createViewerFile(viewerTemplateFile, tnDescrs, shortAlbumTitle, dstDir)
     
     print "Done!"
